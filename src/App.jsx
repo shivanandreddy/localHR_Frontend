@@ -9,6 +9,7 @@ import PayrollDashboard from './pages/PayrollDashboard';
 import EmployeeForm from './components/EmployeeForm';
 import ProtectedRoute from './components/ProtectedRoute'; 
 import PunchIn from './components/PunchIn';
+import PunchOut from './components/PunchOut';
 import EmployeeDashboard from './pages/EmployeeDashboard';
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
         {/* Public Routes (No login required) */}
         <Route path="/login" element={<Login />} />
         <Route path="/punch-in" element={<PunchIn />} />
+        <Route path="/punch-out" element={<PunchOut />} />
 
         {/* Redirect root directly to the public Punch-In kiosk */}
         <Route path="/" element={<Navigate to="/punch-in" replace />} />
@@ -46,7 +48,7 @@ export default function App() {
         <Route 
           path="/employees" 
           element={
-            <ProtectedRoute allowedRoles={['Admin', 'Manager']}>
+            <ProtectedRoute >
               <EmployeeList />
             </ProtectedRoute>
           } 

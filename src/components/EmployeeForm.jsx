@@ -205,7 +205,7 @@ export default function EmployeeForm() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Add New Employee</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Employee Registration</h1>
           <p className="text-sm text-gray-500">Onboard staff, register face biometrics, and configure work location & shift</p>
         </div>
         <button

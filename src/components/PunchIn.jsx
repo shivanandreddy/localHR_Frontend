@@ -96,8 +96,8 @@ export default function PunchIn() {
   return (
     <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 p-6 my-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Automatic Kiosk Punch-In</h2>
-        <p className="text-sm text-gray-500 mt-1">Look at the camera — no login or email required</p>
+        <h2 className="text-2xl font-bold text-gray-800">LocalHR Punch-In</h2>
+        <p className="text-sm text-gray-500 mt-1">Look at the camera — press Scan & Punch In</p>
       </div>
 
       <div className="relative w-full aspect-square bg-slate-900 rounded-xl overflow-hidden shadow-inner mb-6 flex items-center justify-center">
@@ -108,7 +108,7 @@ export default function PunchIn() {
           muted 
           className="w-full h-full object-cover transform -scale-x-100"
         />
-        <div className="absolute inset-0 border-4 border-dashed border-blue-400 rounded-full m-8 pointer-events-none flex items-center justify-center">
+        <div className="absolute inset-0 border-4 border-dashed border-green-400 rounded-full m-8 pointer-events-none flex items-center justify-center">
           <span className="text-white text-xs bg-slate-900/80 px-3 py-1 rounded-full">
             {modelsLoaded ? "Align Face" : "Loading AI..."}
           </span>
