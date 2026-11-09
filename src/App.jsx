@@ -3,14 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 // Import Pages & Components
 import Login from './pages/Login';
-import ClockIn from './components/ClockIn';
 import EmployeeList from './pages/EmployeeList';
 import PayrollDashboard from './pages/PayrollDashboard';
 import EmployeeForm from './components/EmployeeForm';
 import ProtectedRoute from './components/ProtectedRoute'; 
-import PunchIn from './components/PunchIn';
-import PunchOut from './components/PunchOut';
-import EmployeeDashboard from './pages/EmployeeDashboard';
+import Punch from './components/Punch';
+import Dashboard from './pages/Dashboard';
+import Payslips from './pages/Payslips'; // Import the new Payslips component
 
 export default function App() {
   return (
@@ -18,8 +17,7 @@ export default function App() {
       <Routes>
         {/* Public Routes (No login required) */}
         <Route path="/login" element={<Login />} />
-        <Route path="/punch-in" element={<PunchIn />} />
-        <Route path="/punch-out" element={<PunchOut />} />
+        <Route path="/punch" element={<Punch />} />
 
         {/* Redirect root directly to the public Punch-In kiosk */}
         <Route path="/" element={<Navigate to="/punch-in" replace />} />
@@ -28,27 +26,29 @@ export default function App() {
         <Route 
           path="/dashboard" 
           element={
-            <ProtectedRoute>
-              <EmployeeDashboard />
-            </ProtectedRoute>
-          }  allowedRoles={['Admin', 'Manager','Employee']}
-        />
-
-        {/* Protected Biometric Clock-In Route (Requires session token) */}
-        <Route 
-          path="/clock-in" 
-          element={
-            <ProtectedRoute>
-              <ClockIn />
+            <ProtectedRoute allowedRoles={['Admin', 'Manager', 'Employee']}>
+              <Dashboard />
             </ProtectedRoute>
           } 
         />
+
+        {/* Protected Employee Payslips Route */}
+        <Route 
+          path="/payslips" 
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Manager', 'Employee']}>
+              <Payslips />
+            </ProtectedRoute>
+          } 
+        />
+
+        
 
         {/* Protected Employee Management Route (Admin & Manager Only) */}
         <Route 
           path="/employees" 
           element={
-            <ProtectedRoute >
+            <ProtectedRoute allowedRoles={['Admin', 'Manager']}>
               <EmployeeList />
             </ProtectedRoute>
           } 
@@ -75,7 +75,7 @@ export default function App() {
         />
 
         {/* Catch-all fallback */}
-        <Route path="*" element={<Navigate to="/punch-in" replace />} />
+        <Route path="*" element={<Navigate to="/punch" replace />} />
 
       </Routes>
     </Router>
