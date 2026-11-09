@@ -78,8 +78,8 @@ export default function Dashboard() {
       <div className={`rounded-3xl p-6 sm:p-8 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-colors border border-transparent dark:border-slate-800 ${currentAccent.primary.split(' ')[0]} dark:bg-slate-900`}>
         <div>
          
-          <h1 className="text-2xl sm:text-3xl font-extrabold mt-2 text-white">
-            Hi, {employee?.name || 'Employee'}! 👋
+          <h1 className="text-2xl sm:text-3xl font-bold mt-2 text-white">
+            Hi, {employee?.name}! 👋
           </h1>
           <p className="text-white/80 text-xs sm:text-sm mt-1">
             {employee?.email} • Shift: {employee?.shiftStart || '09:00'} - {employee?.shiftEnd || '18:00'}
@@ -109,7 +109,7 @@ export default function Dashboard() {
             <span className="text-xs font-semibold uppercase tracking-wider">Days Present</span>
             <span className="w-2 h-2 rounded-full bg-green-500"></span>
           </div>
-          <p className="text-2xl   font-black text-green-800 dark:text-green-500 ">{summary.totalPresent} Days</p>
+          <p className="text-xl   font-black text-green-800 dark:text-green-500 ">{summary.totalPresent} Days</p>
           <p className="text-[11px] text-green-400 dark:text-green-500 font-medium">Active shift logs this month</p>
         </div>
 
@@ -119,7 +119,7 @@ export default function Dashboard() {
             <span className="text-xs font-semibold uppercase tracking-wider">Late Count</span>
             <span className="w-2 h-2 rounded-full bg-amber-500"></span>
           </div>
-          <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{summary.totalLate} Times</p>
+          <p className="text-xl font-black text-amber-600 dark:text-amber-400">{summary.totalLate} Times</p>
           <p className="text-[11px] text-amber-600/80 dark:text-amber-400/80 font-medium">
             Rule: 3 Lates = 1 Day Penalty
           </p>
@@ -131,7 +131,7 @@ export default function Dashboard() {
             <span className="text-xs font-semibold uppercase tracking-wider">Deduction Penalty</span>
             <span className="w-2 h-2 rounded-full bg-rose-500"></span>
           </div>
-          <p className="text-2xl font-black text-rose-600 dark:text-rose-400">
+          <p className="text-xl font-black text-rose-600 dark:text-rose-400">
             {summary.deductionDays} {summary.deductionDays === 1 ? 'Day' : 'Days'}
           </p>
           <p className="text-[11px] text-rose-500 dark:text-rose-400 font-medium">
@@ -145,7 +145,7 @@ export default function Dashboard() {
             <span className="text-xs font-semibold uppercase tracking-wider">Early Going</span>
             <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
           </div>
-          <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{summary.totalEarly} Times</p>
+          <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">{summary.totalEarly} Times</p>
           <p className="text-[11px] text-gray-400 dark:text-slate-500 font-medium">Clocked out before shift end</p>
         </div>
 

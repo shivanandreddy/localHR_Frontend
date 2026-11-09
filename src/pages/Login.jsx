@@ -1,14 +1,24 @@
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { ThemeContext } from "../context/ThemeContext";
+import { Webhook } from "lucide-react";
 
 export default function Login({ onLoginSuccess }) {
   const { login } = useContext(AuthContext);
+  const { theme, toggleTheme, accent, setAccent, currentAccent } = useContext(ThemeContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const accents = [
+    { value: 'blue', color: 'bg-blue-600' },
+    { value: 'orange', color: 'bg-orange-600' },
+    { value: 'emerald', color: 'bg-emerald-600' },
+    { value: 'violet', color: 'bg-violet-600' },
+  ];
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -39,7 +49,30 @@ export default function Login({ onLoginSuccess }) {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-slate-950 px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden bg-slate-950 px-4 py-8 text-slate-900 dark:text-slate-100 sm:px-6 lg:px-8 transition-colors duration-200">
+      
+      {/* Absolute top-right Theme & Accent Picker Controls */}
+      <div className="absolute top-6 right-6 z-50 flex items-center gap-3 bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-800 shadow-lg">
+        <button
+          onClick={toggleTheme}
+          className="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 transition text-xs font-medium"
+        >
+          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+        </button>
+        <div className="h-4 w-[1px] bg-slate-700" />
+        <div className="flex gap-1.5">
+          {accents.map((item) => (
+            <button
+              key={item.value}
+              onClick={() => setAccent(item.value)}
+              className={`w-4 h-4 rounded-full ${item.color} ${
+                accent === item.value ? 'ring-2 ring-white scale-110' : 'opacity-60 hover:opacity-100'
+              } transition-all`}
+            />
+          ))}
+        </div>
+      </div>
+
       {/* Ambient background effects */}
       <div
         aria-hidden="true"
@@ -55,7 +88,8 @@ export default function Login({ onLoginSuccess }) {
       />
 
       <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center justify-center">
-        <section className="grid w-full overflow-hidden rounded-3xl border border-white/10 bg-white shadow-2xl shadow-black/30 lg:min-h-[650px] lg:grid-cols-2">
+        <section className="grid w-full overflow-hidden rounded-3xl border border-white/10 bg-white dark:bg-slate-900 shadow-2xl shadow-black/30 lg:min-h-[650px] lg:grid-cols-2 transition-colors duration-200">
+          
           {/* Brand / welcome panel */}
           <div className="relative hidden overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 p-10 text-white lg:flex lg:flex-col lg:justify-between xl:p-14">
             <div
@@ -73,34 +107,30 @@ export default function Login({ onLoginSuccess }) {
 
             <div className="relative">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20">
-                  <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6" aria-hidden="true">
-                    <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
-                    <path d="M5.5 5.5 18.5 18.5M18.5 5.5 5.5 18.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" opacity=".35" />
-                  </svg>
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg">
+                  <Webhook size={24} strokeWidth={2.5} className={`${currentAccent.text} animate-spin`} />
                 </div>
-                <span className="text-2xl font-bold tracking-tight">
-                  Local<span className="text-cyan-400">HR</span>
+                <span className={`text-2xl font-bold tracking-tight ${currentAccent.text}`}>
+                  Local<span className="text-white">HR</span>
                 </span>
               </div>
 
               <div className="mt-24 max-w-md animate-[fadeUp_.8s_ease-out_both]">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
-                  People. Process. Progress.
-                </p>
-                <h1 className="text-4xl font-bold leading-tight tracking-tight xl:text-5xl">
-                  A smarter way to manage your workforce.
-                </h1>
-                <p className="mt-6 max-w-sm text-base leading-7 text-slate-300">
-                  Bring attendance, employee information and payroll workflows
-                  together in one simple workspace.
-                </p>
-              </div>
+  <p className={`mb-4 text-xs font-semibold uppercase tracking-[0.28em] ${currentAccent.text}`}>
+    Automated Operations
+  </p>
+  <h3 className="text-xl font-bold leading-tight tracking-tight xl:text-2xl text-white">
+   Human Resource Management System
+  </h3>
+  <p className="mt-6 max-w-sm text-base leading-7 text-slate-300">
+    Eliminate manual administration with smart attendance geofencing and instant payroll processing.
+  </p>
+</div>
             </div>
 
             <div className="relative flex items-center gap-3 text-sm text-slate-300">
               <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5">
-                <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-cyan-300" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" className={`h-4 w-4 ${currentAccent.text}`} aria-hidden="true">
                   <path d="m7 12 3.2 3.2L17.5 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
                 </svg>
@@ -110,28 +140,27 @@ export default function Login({ onLoginSuccess }) {
           </div>
 
           {/* Login panel */}
-          <div className="flex items-center justify-center bg-white px-5 py-10 sm:px-10 lg:px-12 xl:px-16">
+          <div className="flex items-center justify-center bg-white dark:bg-slate-900 px-5 py-10 sm:px-10 lg:px-12 xl:px-16 transition-colors duration-200">
             <div className="w-full max-w-md animate-[fadeUp_.7s_ease-out_both]">
+              
               {/* Mobile brand */}
               <div className="mb-10 flex items-center justify-center gap-3 lg:hidden">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/25">
-                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
-                    <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
-                  </svg>
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${currentAccent.primary} text-white shadow-lg`}>
+                  <Webhook size={20} strokeWidth={2.5} className="animate-spin" />
                 </div>
-                <span className="text-2xl font-bold tracking-tight text-slate-900">
-                  Local<span className="text-blue-600">HR</span>
+                <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                  Local<span className={currentAccent.text}>HR</span>
                 </span>
               </div>
 
               <div className="mb-8">
-                <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
+                <p className={`mb-2 text-sm font-semibold uppercase tracking-[0.18em] ${currentAccent.text}`}>
                   Welcome back
                 </p>
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
                   Sign in to your account
                 </h2>
-                <p className="mt-3 text-sm leading-6 text-slate-500">
+                <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
                   Enter your work email and password to continue.
                 </p>
               </div>
@@ -140,7 +169,7 @@ export default function Login({ onLoginSuccess }) {
                 {errorMessage && (
                   <div
                     role="alert"
-                    className="flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 animate-[fadeUp_.2s_ease-out_both]"
+                    className="flex items-start gap-3 rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/50 px-4 py-3 text-sm text-rose-700 dark:text-rose-300 animate-[fadeUp_.2s_ease-out_both]"
                   >
                     <svg viewBox="0 0 24 24" fill="none" className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true">
                       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.7" />
@@ -151,11 +180,11 @@ export default function Login({ onLoginSuccess }) {
                 )}
 
                 <div>
-                  <label htmlFor="email" className="mb-2 block text-sm font-semibold text-slate-700">
+                  <label htmlFor="email" className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
                     Email address
                   </label>
                   <div className="group relative">
-                    <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-blue-600">
+                    <span className={`pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:${currentAccent.text.replace('text-', 'text-')}`}>
                       <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
                         <rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" strokeWidth="1.7" />
                         <path d="m4 7 8 6 8-6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
@@ -170,19 +199,19 @@ export default function Login({ onLoginSuccess }) {
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       placeholder="you@company.com"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-4 text-base text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-3.5 pl-12 pr-4 text-base text-slate-900 dark:text-slate-100 outline-none transition duration-200 placeholder:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10"
                     />
                   </div>
                 </div>
 
                 <div>
                   <div className="mb-2 flex items-center justify-between gap-3">
-                    <label htmlFor="password" className="block text-sm font-semibold text-slate-700">
+                    <label htmlFor="password" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                       Password
                     </label>
                   </div>
                   <div className="group relative">
-                    <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-blue-600">
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors">
                       <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
                         <rect x="4" y="10" width="16" height="11" rx="2.5" stroke="currentColor" strokeWidth="1.7" />
                         <path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
@@ -198,13 +227,13 @@ export default function Login({ onLoginSuccess }) {
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
                       placeholder="Enter your password"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-12 text-base text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-3.5 pl-12 pr-12 text-base text-slate-900 dark:text-slate-100 outline-none transition duration-200 placeholder:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((current) => !current)}
                       aria-label={showPassword ? "Hide password" : "Show password"}
-                      className="absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 transition hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      className="absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 transition hover:text-slate-700 dark:hover:text-slate-200 focus:outline-none"
                     >
                       {showPassword ? (
                         <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
@@ -224,7 +253,7 @@ export default function Login({ onLoginSuccess }) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/25 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/30 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
+                  className={`group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl ${currentAccent.primary} px-5 py-3.5 text-sm font-semibold text-white shadow-lg transition duration-200 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none disabled:cursor-not-allowed disabled:opacity-70`}
                 >
                   <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                   {loading ? (
@@ -246,7 +275,7 @@ export default function Login({ onLoginSuccess }) {
                 </button>
               </form>
 
-              <div className="mt-8 flex items-center justify-center gap-2 text-center text-xs text-slate-500">
+              <div className="mt-8 flex items-center justify-center gap-2 text-center text-xs text-slate-500 dark:text-slate-400">
                 <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-emerald-600" aria-hidden="true">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
                   <path d="m9 12 2 2 4-4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
@@ -254,7 +283,7 @@ export default function Login({ onLoginSuccess }) {
                 Protected by secure authentication
               </div>
 
-              <p className="mt-10 text-center text-xs text-slate-400">
+              <p className="mt-10 text-center text-xs text-slate-400 dark:text-slate-500">
                 © {new Date().getFullYear()} LocalHR. All rights reserved.
               </p>
             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import {Webhook } from 'lucide-react';
+import { Webhook } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 
@@ -54,30 +54,28 @@ export default function Layout({ children }) {
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div>
-         <div className="px-5 py-4 border-b border-slate-800 grid grid-cols-[32px_1fr] items-center gap-x-3">
+          <div className="px-5 py-4 border-b border-slate-800 grid grid-cols-[32px_1fr] items-center gap-x-3">
+            {/* First Column */}
+            <div className="row-span-2 flex items-center justify-center">
+              <div className="relative inline-flex items-center justify-center flame-icon">
+                <Webhook
+                  size={30}
+                  strokeWidth={2.5}
+                  className={`${currentAccent.text} relative z-10 animate-spin`}
+                />
+              </div>
+            </div>
 
-  {/* First Column */}
-  <div className="row-span-2 flex items-center justify-center">
-    <div className="relative inline-flex items-center justify-center flame-icon">
-  <Webhook
-    size={30}
-    strokeWidth={2.5}
-    className={`${currentAccent.text} relative z-10 animate-spin`}
-  />
-</div>
-  </div>
+            {/* Second Column - First Row */}
+            <span className={`font-bold text-lg tracking-wider leading-tight ${currentAccent.text}`}>
+              Local<span className="text-white">HR</span>
+            </span>
 
-  {/* Second Column - First Row */}
-  <span className={`font-bold text-lg tracking-wider leading-tight ${currentAccent.text}`}>
-    Local<span className="text-white">HR</span>
-  </span>
-
-  {/* Second Column - Second Row */}
-  <span className="text-md text-slate-400 font-normal leading-tight">
-    HR Operations
-  </span>
-
-</div>
+            {/* Second Column - Second Row */}
+            <span className="text-md text-slate-400 font-normal leading-tight">
+              HR Operations
+            </span>
+          </div>
 
           <nav className="p-4 space-y-2">        
             {/* Employee Portal / Dashboard Link */}
@@ -88,7 +86,7 @@ export default function Layout({ children }) {
                 isActive('/dashboard') ? currentAccent.primary : 'text-slate-300 hover:bg-slate-800 hover:text-white'
               }`}
             >
-            Dashboard
+              Dashboard
             </Link>
 
             {/* Payslips Link */}
@@ -102,16 +100,30 @@ export default function Layout({ children }) {
               My Payslips
             </Link>
 
+            {/* Profile Link */}
             <Link 
-              to="/employees" 
+              to="/profile" 
               onClick={() => setMobileMenuOpen(false)}
               className={`block px-4 py-2.5 rounded-lg font-medium transition ${
-                isActive('/employees') || isActive('/employees/new') ? currentAccent.primary : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                isActive('/profile') ? currentAccent.primary : 'text-slate-300 hover:bg-slate-800 hover:text-white'
               }`}
             >
-              Employees
+             Update Profile
             </Link>
 
+            {/* Employees Link - Visible to Admins Only */}
+{user?.role === 'Admin' && (
+  <Link 
+    to="/employees" 
+    onClick={() => setMobileMenuOpen(false)}
+    className={`block px-4 py-2.5 rounded-lg font-medium transition ${
+      isActive('/employees') || isActive('/employees/new') ? currentAccent.primary : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+    }`}
+  >
+    Employees
+  </Link>
+)}
+            {user?.role === 'Admin' && (
             <Link 
               to="/payroll" 
               onClick={() => setMobileMenuOpen(false)}
@@ -121,6 +133,7 @@ export default function Layout({ children }) {
             >
               Payroll Engine
             </Link>
+            )}
 
           </nav>
         </div>
@@ -175,8 +188,6 @@ export default function Layout({ children }) {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-       
-
         {/* Dynamic Page Content Container */}
         <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
           {children}

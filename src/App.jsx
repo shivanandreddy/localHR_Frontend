@@ -9,7 +9,8 @@ import EmployeeForm from './components/EmployeeForm';
 import ProtectedRoute from './components/ProtectedRoute'; 
 import Punch from './components/Punch';
 import Dashboard from './pages/Dashboard';
-import Payslips from './pages/Payslips'; // Import the new Payslips component
+import Payslips from './pages/Payslips'; 
+import Profile from './pages/Profile';
 
 export default function App() {
   return (
@@ -19,8 +20,8 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/punch" element={<Punch />} />
 
-        {/* Redirect root directly to the public Punch-In kiosk */}
-        <Route path="/" element={<Navigate to="/punch-in" replace />} />
+        {/* Redirect root directly to the public Punch kiosk */}
+        <Route path="/" element={<Navigate to="/punch" replace />} />
 
         {/* Protected Employee Dashboard Route */}
         <Route 
@@ -42,7 +43,15 @@ export default function App() {
           } 
         />
 
-        
+        {/* Protected Employee Profile Route */}
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Manager', 'Employee']}>
+              <Profile />
+            </ProtectedRoute>
+          } 
+        />
 
         {/* Protected Employee Management Route (Admin & Manager Only) */}
         <Route 
