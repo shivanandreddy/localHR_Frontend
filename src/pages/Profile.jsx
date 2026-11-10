@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import API from '../services/api';
 import { ThemeContext } from '../context/ThemeContext';
+import { AuthContext } from '../context/AuthContext';
 
 export default function Profile() {
   const { currentAccent } = useContext(ThemeContext);
+  const { user, updateUser } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -26,9 +28,9 @@ export default function Profile() {
     setLoading(true);
     setError(null);
     try {
-      // Adjust endpoint if your route prefix differs (e.g. /api/employees/profile)
       const res = await API.get('/api/employees/profile');
-      const emp = res.data.employee || res.data;
+      const emp = res.data.employee || res.data.data || res.data;
+      
       setFormData({
         name: emp.name || '',
         email: emp.email || '',
@@ -38,7 +40,18 @@ export default function Profile() {
       });
     } catch (err) {
       console.error('Failed to load profile:', err);
-      setError(err.response?.data?.message || 'Could not load your profile details.');
+      // Fallback to AuthContext user object if API request encounters an issue
+      if (user) {
+        setFormData({
+          name: user.name || '',
+          email: user.email || '',
+          shiftStart: user.shiftStart || '09:30',
+          shiftEnd: user.shiftEnd || '18:30',
+          password: '',
+        });
+      } else {
+        setError(err.response?.data?.message || 'Could not load your profile details.');
+      }
     } finally {
       setLoading(false);
     }
@@ -62,6 +75,18 @@ export default function Profile() {
       }
 
       const res = await API.put('/api/employees/profile', payload);
+      const updatedEmployee = res.data.employee || res.data.data || payload;
+
+      // Instantly update global AuthContext & localStorage so UI (sidebar name, etc.) reflects changes
+      if (updateUser) {
+        updateUser({
+          name: updatedEmployee.name,
+          email: updatedEmployee.email,
+          shiftStart: updatedEmployee.shiftStart,
+          shiftEnd: updatedEmployee.shiftEnd,
+        });
+      }
+
       setSuccessMessage(res.data.message || 'Profile updated successfully!');
       setFormData((prev) => ({ ...prev, password: '' })); // clear password input after update
     } catch (err) {
@@ -196,7 +221,7 @@ export default function Profile() {
           <button
             type="submit"
             disabled={updating}
-            className={`py-3 px-6 ${currentAccent.primary} disabled:opacity-50 font-semibold rounded-2xl shadow-md transition-all text-sm flex items-center space-x-2`}
+            className={`py-3 px-6 ${currentAccent.primary} disabled:opacity-50 font-semibold rounded-2xl shadow-md transition-all text-sm flex items-center space-x-2 text-white`}
           >
             {updating ? 'Saving Changes...' : 'Save Profile Changes'}
           </button>

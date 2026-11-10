@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
-import API from '../services/api'; // Import your configured Axios instance[cite: 1]
-import { AuthContext } from '../context/AuthContext'; // Adjust import path based on your folder structure
+import API from '../services/api'; 
+import { AuthContext } from '../context/AuthContext'; 
+import { ThemeContext } from '../context/ThemeContext';
+import { FileText, Download, Search, AlertCircle, Calendar, User, Briefcase, Clock } from 'lucide-react';
 
 export default function Payslips() {
-  const { user } = useContext(AuthContext); // Extract logged-in employee details
+  const { user } = useContext(AuthContext); 
+  const { currentAccent } = useContext(ThemeContext);
+
   const [payslips, setPayslips] = useState([]);
   const [selectedPayslip, setSelectedPayslip] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +29,6 @@ export default function Payslips() {
         return;
       }
 
-      // Using your pre-configured API client (handles baseURL, token, & x-device-id automatically)[cite: 1]
       const response = await API.get(`/api/payroll/payslips?employee_id=${employeeId}`);
       
       const records = response.data.payslips || [];
@@ -43,7 +46,6 @@ export default function Payslips() {
 
   const handleDownloadPDF = async (payslipId) => {
     try {
-      // Using API client for authenticated file download request[cite: 1]
       const response = await API.get(`/api/payroll/payslips/${payslipId}/download`, {
         responseType: 'blob',
       });
@@ -70,128 +72,189 @@ export default function Payslips() {
 
   if (loading) {
     return (
-      <div style={styles.centerContainer}>
-        <div style={styles.spinner}>Loading your payroll records...</div>
+      <div className="flex justify-center items-center min-h-[60vh] text-gray-400 dark:text-slate-500 text-sm">
+        Loading your payroll records...
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6 transition-colors duration-200">
+      
+      {/* Header Section */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 style={styles.title}>Salary & Payslips</h2>
-          <p style={styles.subtitle}>View monthly breakdowns, attendance deductions, and download payslips.</p>
+          <span className={`text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full ${currentAccent.badge}`}>
+            Payroll Portal
+          </span>
+          <h1 className="text-2xl font-extrabold text-gray-800 dark:text-gray-100 mt-2">
+            Salary & Payslips
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
+            View monthly breakdowns, attendance deductions, and download payslips.
+          </p>
         </div>
-        <div style={styles.searchBox}>
-          <input 
-            type="text" 
-            placeholder="Search month or slip ID..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={styles.searchInput}
-          />
+
+        <div className="w-full md:w-72">
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+              <Search size={16} />
+            </span>
+            <input 
+              type="text" 
+              placeholder="Search month or slip ID..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            />
+          </div>
         </div>
       </div>
 
-      {error && <div style={styles.errorAlert}>{error}</div>}
+      {error && (
+        <div className="p-4 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-sm rounded-2xl font-medium flex items-center gap-2">
+          <AlertCircle size={18} />
+          <span>{error}</span>
+        </div>
+      )}
 
       {payslips.length === 0 && !error ? (
-        <div style={styles.emptyState}>No payslips generated for your account yet.</div>
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-gray-100 dark:border-slate-800 text-gray-500 dark:text-slate-400 text-sm">
+          No payslips generated for your account yet.
+        </div>
       ) : (
-        <div style={styles.gridContainer}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          
           {/* Left Column: Payslip History List */}
-          <div style={styles.listCard}>
-            <h3 style={styles.sectionTitle}>History</h3>
-            <div style={styles.list}>
-              {filteredPayslips.map((slip) => (
-                <div 
-                  key={slip.id}
-                  onClick={() => setSelectedPayslip(slip)}
-                  style={{
-                    ...styles.listItem,
-                    backgroundColor: selectedPayslip?.id === slip.id ? '#e0f2fe' : '#ffffff',
-                    borderColor: selectedPayslip?.id === slip.id ? '#0284c7' : '#e2e8f0'
-                  }}
-                >
-                  <div>
-                    <span style={styles.listMonth}>{slip.pay_period_month}</span>
-                    <span style={styles.listId}>{slip.reference_no || slip.id}</span>
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 px-1">
+              History
+            </h3>
+            <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
+              {filteredPayslips.map((slip) => {
+                const isSelected = selectedPayslip?.id === slip.id;
+                return (
+                  <div 
+                    key={slip.id}
+                    onClick={() => setSelectedPayslip(slip)}
+                    className={`p-4 rounded-2xl border cursor-pointer transition-all flex justify-between items-center ${
+                      isSelected 
+                        ? 'bg-blue-50/50 dark:bg-blue-950/30 border-blue-500 shadow-sm' 
+                        : 'bg-gray-50 dark:bg-slate-800/60 border-gray-200/60 dark:border-slate-700/60 hover:bg-gray-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <div>
+                      <span className="block text-sm font-semibold text-gray-800 dark:text-gray-100">
+                        {slip.pay_period_month}
+                      </span>
+                      <span className="block text-xs text-gray-400 dark:text-slate-500 mt-0.5">
+                        {slip.reference_no || slip.id}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="block text-sm font-extrabold text-gray-900 dark:text-gray-100">
+                        ₹{Number(slip.net_salary).toLocaleString()}
+                      </span>
+                      <span className="inline-block mt-1 text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">
+                        {slip.status || 'PAID'}
+                      </span>
+                    </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={styles.listNetPay}>₹{Number(slip.net_salary).toLocaleString()}</span>
-                    <span style={styles.badge}>{slip.status || 'PAID'}</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           {/* Right Column: Detailed Payslip Card */}
-          <div style={styles.detailCard}>
+          <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800 shadow-sm space-y-6">
             {selectedPayslip ? (
-              <div>
-                <div style={styles.detailHeader}>
+              <>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div>
-                    <h3 style={styles.detailTitle}>Payslip - {selectedPayslip.pay_period_month}</h3>
-                    <p style={styles.detailSub}>Ref: {selectedPayslip.reference_no || selectedPayslip.id}</p>
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                      Payslip - {selectedPayslip.pay_period_month}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                      Ref: {selectedPayslip.reference_no || selectedPayslip.id}
+                    </p>
                   </div>
                   <button 
                     onClick={() => handleDownloadPDF(selectedPayslip.id)}
-                    style={styles.downloadBtn}
+                    className={`py-2.5 px-5 ${currentAccent.primary} text-white font-semibold rounded-xl shadow-md transition-all text-xs flex items-center space-x-2`}
                   >
-                    Download PDF
+                    <Download size={14} />
+                    <span>Download PDF</span>
                   </button>
                 </div>
 
-                <div style={styles.divider} />
+                <div className="h-[1px] bg-gray-100 dark:bg-slate-800 my-4" />
 
                 {/* Employee Quick Info */}
-                <div style={styles.empInfoGrid}>
-                  <div><strong>Employee Name:</strong> {user?.first_name} {user?.last_name}</div>
-                  <div><strong>Designation:</strong> {user?.designation || 'Staff'}</div>
-                  <div><strong>Worked Days:</strong> {selectedPayslip.present_days || 30} Days</div>
-                  <div><strong>Lateness/Early Leaves:</strong> {selectedPayslip.late_count || 0} Records</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 text-xs text-gray-600 dark:text-slate-300">
+                  <div className="flex items-center gap-2">
+                    <User size={14} className="text-gray-400" />
+                    <span><strong>Employee:</strong> {user?.first_name || user?.name} {user?.last_name || ''}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Briefcase size={14} className="text-gray-400" />
+                    <span><strong>Designation:</strong> {user?.designation || 'Staff'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar size={14} className="text-gray-400" />
+                    <span><strong>Worked Days:</strong> {selectedPayslip.present_days || 30} Days</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock size={14} className="text-gray-400" />
+                    <span><strong>Lateness/Early Leaves:</strong> {selectedPayslip.late_count || 0} Records</span>
+                  </div>
                 </div>
 
-                <div style={styles.breakdownGrid}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Earnings */}
-                  <div style={styles.breakdownBox}>
-                    <h4 style={styles.boxTitle}>Earnings</h4>
-                    <div style={styles.row}>
-                      <span>Basic Pay</span>
-                      <span>₹{Number(selectedPayslip.basic_pay || 0).toLocaleString()}</span>
+                  <div className="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-5 border border-gray-100 dark:border-slate-800 space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300">
+                      Earnings
+                    </h4>
+                    <div className="space-y-2 text-xs text-gray-600 dark:text-slate-400">
+                      <div className="flex justify-between">
+                        <span>Basic Pay</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">₹{Number(selectedPayslip.basic_pay || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Allowances (HRA/DA)</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">₹{Number(selectedPayslip.allowances || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Incentives / Overtime</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">₹{Number(selectedPayslip.incentives || 0).toLocaleString()}</span>
+                      </div>
                     </div>
-                    <div style={styles.row}>
-                      <span>Allowances (HRA/DA)</span>
-                      <span>₹{Number(selectedPayslip.allowances || 0).toLocaleString()}</span>
-                    </div>
-                    <div style={styles.row}>
-                      <span>Incentives / Overtime</span>
-                      <span>₹{Number(selectedPayslip.incentives || 0).toLocaleString()}</span>
-                    </div>
-                    <div style={{ ...styles.row, ...styles.totalRow }}>
+                    <div className="pt-2 border-t border-gray-200 dark:border-slate-700 flex justify-between text-xs font-bold text-gray-900 dark:text-gray-100">
                       <span>Gross Salary</span>
                       <span>₹{Number(selectedPayslip.gross_salary || 0).toLocaleString()}</span>
                     </div>
                   </div>
 
                   {/* Deductions */}
-                  <div style={styles.breakdownBox}>
-                    <h4 style={styles.boxTitle}>Deductions</h4>
-                    <div style={styles.row}>
-                      <span>Provident Fund (PF)</span>
-                      <span>₹{Number(selectedPayslip.pf_deduction || 0).toLocaleString()}</span>
+                  <div className="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-5 border border-gray-100 dark:border-slate-800 space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-slate-300">
+                      Deductions
+                    </h4>
+                    <div className="space-y-2 text-xs text-gray-600 dark:text-slate-400">
+                      <div className="flex justify-between">
+                        <span>Provident Fund (PF)</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">₹{Number(selectedPayslip.pf_deduction || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Professional Tax (PT)</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">₹{Number(selectedPayslip.pt_deduction || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Attendance Deductions</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">₹{Number(selectedPayslip.attendance_deductions || 0).toLocaleString()}</span>
+                      </div>
                     </div>
-                    <div style={styles.row}>
-                      <span>Professional Tax (PT)</span>
-                      <span>₹{Number(selectedPayslip.pt_deduction || 0).toLocaleString()}</span>
-                    </div>
-                    <div style={styles.row}>
-                      <span>Lateness / Attendance Deductions</span>
-                      <span>₹{Number(selectedPayslip.attendance_deductions || 0).toLocaleString()}</span>
-                    </div>
-                    <div style={{ ...styles.row, ...styles.totalRow }}>
+                    <div className="pt-2 border-t border-gray-200 dark:border-slate-700 flex justify-between text-xs font-bold text-rose-600 dark:text-rose-400">
                       <span>Total Deductions</span>
                       <span>₹{Number(selectedPayslip.total_deductions || 0).toLocaleString()}</span>
                     </div>
@@ -199,241 +262,29 @@ export default function Payslips() {
                 </div>
 
                 {/* Net Pay Banner */}
-                <div style={styles.netPayBanner}>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 p-5 rounded-2xl gap-4">
                   <div>
-                    <span style={styles.netLabel}>Net Take-Home Pay</span>
-                    <span style={styles.payDate}>
+                    <span className="block text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                      Net Take-Home Pay
+                    </span>
+                    <span className="block text-xs text-emerald-600/80 dark:text-emerald-400/80 mt-0.5">
                       Processed on {selectedPayslip.payment_date ? new Date(selectedPayslip.payment_date).toLocaleDateString() : 'End of Month'}
                     </span>
                   </div>
-                  <span style={styles.netAmount}>₹{Number(selectedPayslip.net_salary || 0).toLocaleString()}</span>
+                  <span className="text-2xl font-extrabold text-emerald-700 dark:text-emerald-300">
+                    ₹{Number(selectedPayslip.net_salary || 0).toLocaleString()}
+                  </span>
                 </div>
-              </div>
+              </>
             ) : (
-              <div style={styles.emptyState}>Select a payslip from the list to view its complete breakdown.</div>
+              <div className="py-20 text-center text-gray-400 dark:text-slate-500 text-sm">
+                Select a payslip from the list to view its complete breakdown.
+              </div>
             )}
           </div>
+
         </div>
       )}
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: '24px',
-    fontFamily: 'Inter, system-ui, sans-serif',
-    backgroundColor: '#f8fafc',
-    minHeight: '100vh',
-    color: '#1e293b'
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '24px',
-    flexWrap: 'wrap',
-    gap: '16px'
-  },
-  title: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    margin: '0 0 4px 0'
-  },
-  subtitle: {
-    fontSize: '14px',
-    color: '#64748b',
-    margin: 0
-  },
-  searchBox: {
-    minWidth: '240px'
-  },
-  searchInput: {
-    width: '100%',
-    padding: '10px 14px',
-    borderRadius: '8px',
-    border: '1px solid #cbd5e1',
-    fontSize: '14px',
-    outline: 'none'
-  },
-  gridContainer: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 2fr',
-    gap: '24px',
-    alignItems: 'start'
-  },
-  listCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    padding: '20px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-  },
-  sectionTitle: {
-    fontSize: '16px',
-    fontWeight: '600',
-    margin: '0 0 16px 0'
-  },
-  list: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px'
-  },
-  listItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    border: '1px solid',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease'
-  },
-  listMonth: {
-    display: 'block',
-    fontSize: '14px',
-    fontWeight: '600'
-  },
-  listId: {
-    display: 'block',
-    fontSize: '12px',
-    color: '#64748b'
-  },
-  listNetPay: {
-    display: 'block',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    color: '#0f172a'
-  },
-  badge: {
-    fontSize: '11px',
-    backgroundColor: '#dcfce7',
-    color: '#15803d',
-    padding: '2px 8px',
-    borderRadius: '12px',
-    fontWeight: '500'
-  },
-  detailCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    padding: '24px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-  },
-  detailHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start'
-  },
-  detailTitle: {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    margin: '0 0 4px 0'
-  },
-  detailSub: {
-    fontSize: '13px',
-    color: '#64748b',
-    margin: 0
-  },
-  downloadBtn: {
-    backgroundColor: '#0284c7',
-    color: '#ffffff',
-    border: 'none',
-    padding: '8px 16px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontWeight: '500',
-    fontSize: '13px'
-  },
-  divider: {
-    height: '1px',
-    backgroundColor: '#e2e8f0',
-    margin: '20px 0'
-  },
-  empInfoGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '12px',
-    backgroundColor: '#f8fafc',
-    padding: '14px',
-    borderRadius: '8px',
-    fontSize: '13px',
-    marginBottom: '20px',
-    border: '1px solid #f1f5f9'
-  },
-  breakdownGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '16px',
-    marginBottom: '20px'
-  },
-  breakdownBox: {
-    backgroundColor: '#ffffff',
-    borderRadius: '8px',
-    padding: '16px',
-    border: '1px solid #e2e8f0'
-  },
-  boxTitle: {
-    fontSize: '14px',
-    fontWeight: '600',
-    margin: '0 0 12px 0',
-    color: '#334155'
-  },
-  row: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '13px',
-    marginBottom: '10px',
-    color: '#475569'
-  },
-  totalRow: {
-    fontWeight: 'bold',
-    borderTop: '1px solid #cbd5e1',
-    paddingTop: '10px',
-    marginTop: '10px',
-    color: '#0f172a'
-  },
-  netPayBanner: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#f0fdf4',
-    border: '1px solid #bbf7d0',
-    padding: '16px 20px',
-    borderRadius: '8px'
-  },
-  netLabel: {
-    display: 'block',
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#166534'
-  },
-  payDate: {
-    display: 'block',
-    fontSize: '12px',
-    color: '#15803d'
-  },
-  netAmount: {
-    fontSize: '22px',
-    fontWeight: 'bold',
-    color: '#15803d'
-  },
-  centerContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '200px'
-  },
-  errorAlert: {
-    backgroundColor: '#fef2f2',
-    color: '#991b1b',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    marginBottom: '16px',
-    fontSize: '14px'
-  },
-  emptyState: {
-    textAlign: 'center',
-    padding: '32px',
-    color: '#64748b',
-    fontSize: '14px'
-  }
-};

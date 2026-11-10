@@ -5,7 +5,7 @@ import { Webhook } from "lucide-react";
 
 export default function Login({ onLoginSuccess }) {
   const { login } = useContext(AuthContext);
-  const { theme, toggleTheme, accent, setAccent, currentAccent } = useContext(ThemeContext);
+  const {  currentAccent } = useContext(ThemeContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,27 +51,6 @@ export default function Login({ onLoginSuccess }) {
   return (
     <main className="relative min-h-screen overflow-hidden bg-slate-950 px-4 py-8 text-slate-900 dark:text-slate-100 sm:px-6 lg:px-8 transition-colors duration-200">
       
-      {/* Absolute top-right Theme & Accent Picker Controls */}
-      <div className="absolute top-6 right-6 z-50 flex items-center gap-3 bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-800 shadow-lg">
-        <button
-          onClick={toggleTheme}
-          className="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 transition text-xs font-medium"
-        >
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
-        <div className="h-4 w-[1px] bg-slate-700" />
-        <div className="flex gap-1.5">
-          {accents.map((item) => (
-            <button
-              key={item.value}
-              onClick={() => setAccent(item.value)}
-              className={`w-4 h-4 rounded-full ${item.color} ${
-                accent === item.value ? 'ring-2 ring-white scale-110' : 'opacity-60 hover:opacity-100'
-              } transition-all`}
-            />
-          ))}
-        </div>
-      </div>
 
       {/* Ambient background effects */}
       <div

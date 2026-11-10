@@ -64,6 +64,16 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Update local user state and storage after profile changes
+  const updateUser = (updatedFields) => {
+    setUser((prevUser) => {
+      if (!prevUser) return null;
+      const newِUser = { ...prevUser, ...updatedFields };
+      localStorage.setItem('user', JSON.stringify(newِUser));
+      return newِUser;
+    });
+  };
+
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>
       {!loading && children}
