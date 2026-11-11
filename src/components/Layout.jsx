@@ -32,7 +32,7 @@ export default function Layout({ children }) {
       {/* Mobile Top Navigation Bar */}
       <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-4 py-3 flex justify-between items-center md:hidden">
         <Webhook />
-        <span className={`font-bold text-lg ${currentAccent.text}`}>Local<span className='text-black dark:text-white'>HR</span></span>
+        <span className={`font-bold text-lg ${currentAccent.text}`}>Esmart<span className='text-black dark:text-white'>HR</span></span>
         <button 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="text-gray-600 dark:text-gray-300 focus:outline-none"
@@ -68,7 +68,7 @@ export default function Layout({ children }) {
 
             {/* Second Column - First Row */}
             <span className={`font-bold text-lg tracking-wider leading-tight ${currentAccent.text}`}>
-              Local<span className="text-white">HR</span>
+              Esmart<span className="text-white">HR</span>
             </span>
 
             {/* Second Column - Second Row */}

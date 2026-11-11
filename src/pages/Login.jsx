@@ -90,7 +90,7 @@ export default function Login({ onLoginSuccess }) {
                   <Webhook size={24} strokeWidth={2.5} className={`${currentAccent.text} animate-spin`} />
                 </div>
                 <span className={`text-2xl font-bold tracking-tight ${currentAccent.text}`}>
-                  Local<span className="text-white">HR</span>
+                  Esmart<span className="text-white">HR</span>
                 </span>
               </div>
 
@@ -128,7 +128,7 @@ export default function Login({ onLoginSuccess }) {
                   <Webhook size={20} strokeWidth={2.5} className="animate-spin" />
                 </div>
                 <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                  Local<span className={currentAccent.text}>HR</span>
+                  Esmart<span className={currentAccent.text}>HR</span>
                 </span>
               </div>
 
@@ -263,7 +263,7 @@ export default function Login({ onLoginSuccess }) {
               </div>
 
               <p className="mt-10 text-center text-xs text-slate-400 dark:text-slate-500">
-                © {new Date().getFullYear()} LocalHR. All rights reserved.
+                © {new Date().getFullYear()} EsmartHR. All rights reserved.
               </p>
             </div>
           </div>

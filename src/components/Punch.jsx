@@ -153,7 +153,7 @@ export default function Punch() {
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100">
-              <span className={currentAccent.text}>Local</span>HR
+              <span className={currentAccent.text}>Esmart</span>HR
             </h1>
           </div>
 
