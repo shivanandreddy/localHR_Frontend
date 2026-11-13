@@ -26,11 +26,11 @@ export default function Layout({ children }) {
     { value: 'violet', color: 'bg-violet-600' },
   ];
 
-  return (
+ return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col md:flex-row transition-colors duration-200">
       
       {/* Mobile Top Navigation Bar */}
-      <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-4 py-3 flex justify-between items-center md:hidden">
+      <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-4 py-3 flex justify-between items-center md:hidden sticky top-0 z-45">
         <Webhook />
         <span className={`font-bold text-lg ${currentAccent.text}`}>Esmart<span className='text-black dark:text-white'>HR</span></span>
         <button 
@@ -50,9 +50,9 @@ export default function Layout({ children }) {
 
       {/* Sidebar Navigation */}
       <aside className={`
-  fixed inset-y-0 left-0 z-50 w-64 h-screen sticky top-0 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col justify-between border-r border-slate-800 overflow-y-auto
-  ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-`}>
+        fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out md:translate-x-0 md:sticky md:top-0 h-screen flex flex-col justify-between border-r border-slate-800 overflow-y-auto
+        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
         <div>
           <div className="px-5 py-4 border-b border-slate-800 grid grid-cols-[32px_1fr] items-center gap-x-3">
             {/* First Column */}
@@ -111,10 +111,7 @@ export default function Layout({ children }) {
              Update Profile
             </Link>
 
-
-
-
-            {/* NEW: Attendance Exception Requests Link - Visible to Admins & Managers */}
+            {/* Attendance Exception Requests Link - Visible to Admins & Managers */}
             {(user?.role === 'Admin' || user?.role === 'Manager') && (
               <Link 
                 to="/admin/attendance-requests" 
@@ -128,33 +125,29 @@ export default function Layout({ children }) {
             )}
 
             {/* Employees Link - Visible to Admins Only */}
-{user?.role === 'Admin' && (
-  <Link 
-    to="/employees" 
-    onClick={() => setMobileMenuOpen(false)}
-    className={`block px-4 py-2.5 rounded-lg font-medium transition ${
-      isActive('/employees') || isActive('/employees/new') ? currentAccent.primary : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-    }`}
-  >
-    Employees
-  </Link>
-)}
-
-
             {user?.role === 'Admin' && (
-            <Link 
-              to="/payroll" 
-              onClick={() => setMobileMenuOpen(false)}
-              className={`block px-4 py-2.5 rounded-lg font-medium transition ${
-                isActive('/payroll') ? currentAccent.primary : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-              }`}
-            >
-              Payroll Engine
-            </Link>
+              <Link 
+                to="/employees" 
+                onClick={() => setMobileMenuOpen(false)}
+                className={`block px-4 py-2.5 rounded-lg font-medium transition ${
+                  isActive('/employees') || isActive('/employees/new') ? currentAccent.primary : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                Employees
+              </Link>
             )}
 
-
-
+            {user?.role === 'Admin' && (
+              <Link 
+                to="/payroll" 
+                onClick={() => setMobileMenuOpen(false)}
+                className={`block px-4 py-2.5 rounded-lg font-medium transition ${
+                  isActive('/payroll') ? currentAccent.primary : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                Payroll Engine
+              </Link>
+            )}
           </nav>
         </div>
 
