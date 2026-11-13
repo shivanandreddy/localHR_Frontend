@@ -39,7 +39,7 @@ export default function AttendanceRequestModal({ dateStr, initialRecord, onClose
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-              Request Attendance Exception
+              Request for Exception
             </h2>
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
               Date: {formData.date}
