@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import API from '../services/api';
 import { ThemeContext } from '../context/ThemeContext';
+import { PlusCircle } from 'lucide-react';
+import AttendanceRequestModal from './AttendanceRequestModal'; // <--- IMPORT HERE
 
 export default function AttendanceCalendar() {
   const { currentAccent } = useContext(ThemeContext);
@@ -10,8 +12,12 @@ export default function AttendanceCalendar() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Modal State
+  const [selectedDayRecord, setSelectedDayRecord] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const year = currentDate.getFullYear();
-  const month = currentDate.getMonth() + 1; // 1-12
+  const month = currentDate.getMonth() + 1;
 
   useEffect(() => {
     fetchMonthAttendance();
@@ -26,7 +32,12 @@ export default function AttendanceCalendar() {
       
       const map = {};
       records.forEach((record) => {
-        const dayNum = new Date(record.date).getDate();
+        let dayNum;
+        if (record.date && typeof record.date === 'string' && record.date.includes('-')) {
+          dayNum = parseInt(record.date.split('-')[2], 10);
+        } else {
+          dayNum = new Date(record.date).getDate();
+        }
         map[dayNum] = record;
       });
 
@@ -42,12 +53,19 @@ export default function AttendanceCalendar() {
   const firstDayIndex = new Date(year, month - 1, 1).getDay();
   const totalDaysInMonth = new Date(year, month, 0).getDate();
 
-  const handlePrevMonth = () => {
-    setCurrentDate(new Date(year, month - 2, 1));
-  };
+  const handlePrevMonth = () => setCurrentDate(new Date(year, month - 2, 1));
+  const handleNextMonth = () => setCurrentDate(new Date(year, month, 1));
 
-  const handleNextMonth = () => {
-    setCurrentDate(new Date(year, month, 1));
+  const handleDayClick = (dayNum) => {
+    const record = attendanceMap[dayNum] || null;
+    const formattedDate = `${year}-${String(month).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+    
+    setSelectedDayRecord({
+      dayNum,
+      dateStr: formattedDate,
+      record,
+    });
+    setIsModalOpen(true);
   };
 
   const monthNames = [
@@ -56,63 +74,39 @@ export default function AttendanceCalendar() {
   ];
 
   return (
-    <div className="space-y-3 transition-colors">
+    <div className="relative space-y-3 transition-colors">
       
-      {/* Compact Header & Month Navigation Controls */}
-      <div className="flex justify-between items-center pb-2 border-b border-gray-100 dark:border-slate-800">
+      {/* Header & Controls */}
+      <div className="flex flex-wrap justify-between items-center pb-2 gap-2 border-b border-gray-100 dark:border-slate-800">
         <div>
           <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base">
             {monthNames[month - 1]} {year}
           </h3>
-          <p className="text-[11px] text-gray-400 dark:text-slate-400">Monthly attendance overview</p>
+          <p className="text-[11px] text-gray-400 dark:text-slate-400">Monthly overview (Click day cell to request exception)</p>
         </div>
 
-        <div className="flex items-center space-x-1.5">
-          <button
-            onClick={handlePrevMonth}
-            className="p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
-            title="Previous Month"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
+        <div className="flex items-center space-x-2">
           
-          <button
-            onClick={() => setCurrentDate(new Date())}
-            className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
-          >
-            Today
-          </button>
 
-          <button
-            onClick={handleNextMonth}
-            className="p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
-            title="Next Month"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          <div className="flex items-center space-x-1">
+            <button onClick={handlePrevMonth} className="p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-700 transition">
+              ‹
+            </button>
+            <button onClick={() => setCurrentDate(new Date())} className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-700 transition">
+              Today
+            </button>
+            <button onClick={handleNextMonth} className="p-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-700 transition">
+              ›
+            </button>
+          </div>
         </div>
       </div>
 
-      {error && (
-        <div className="p-2.5 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs rounded-xl flex justify-between items-center">
-          <span>{error}</span>
-          <button onClick={fetchMonthAttendance} className="underline text-[11px] font-semibold">Retry</button>
-        </div>
-      )}
-
-      {/* Calendar Grid Container */}
+      {/* Calendar Grid */}
       <div>
-        
-        {/* Days of the Week Header */}
         <div className="grid grid-cols-7 gap-1.5 mb-2 text-center">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-            <div key={day} className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase">
-              {day}
-            </div>
+            <div key={day} className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase">{day}</div>
           ))}
         </div>
 
@@ -120,75 +114,61 @@ export default function AttendanceCalendar() {
           <div className="py-10 text-center text-gray-400 dark:text-slate-500 text-xs">Loading calendar grid...</div>
         ) : (
           <div className="grid grid-cols-7 gap-1.5">
-            
-            {/* Blank padding cells */}
             {Array.from({ length: firstDayIndex }).map((_, index) => (
               <div key={`empty-${index}`} className="h-10 bg-gray-50/30 dark:bg-slate-950/20 rounded-xl opacity-30"></div>
             ))}
 
-            {/* Actual Days of the Month */}
             {Array.from({ length: totalDaysInMonth }).map((_, index) => {
               const dayNum = index + 1;
               const record = attendanceMap[dayNum];
               
-              let statusBg = 'bg-gray-50 dark:bg-slate-800/30 border-gray-100 dark:border-slate-800 text-gray-700 dark:text-gray-300';
+              let statusBg = 'bg-gray-50 dark:bg-slate-800/40 border-gray-100 dark:border-slate-800 text-gray-700 dark:text-gray-300 hover:border-blue-500';
               let badgeText = null;
 
               if (record) {
                 if (record.isLate) {
-                  statusBg = 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300';
+                  statusBg = 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 hover:border-amber-400';
                   badgeText = `Late`;
                 } else if (record.clockIn) {
-                  statusBg = 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300';
+                  statusBg = 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 hover:border-emerald-400';
                   badgeText = 'Present';
                 }
               }
 
               return (
-                <div
+                <button
+                  type="button"
                   key={`day-${dayNum}`}
-                  className={`h-11 p-1.5 rounded-xl border flex flex-col justify-between transition-all ${statusBg}`}
+                  onClick={() => handleDayClick(dayNum)}
+                  className={`h-11 p-1.5 rounded-xl border flex flex-col justify-between transition-all text-left w-full cursor-pointer select-none ${statusBg}`}
                 >
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center w-full pointer-events-none">
                     <span className="text-[11px] font-bold leading-none">{dayNum}</span>
                     {record?.isEarlyGoing && (
                       <span className="w-1.5 h-1.5 rounded-full bg-rose-500" title="Early Going"></span>
                     )}
                   </div>
-
-                  <div className="text-center">
-                    {badgeText ? (
-                      <span className="text-[9px] font-semibold block truncate leading-tight">
-                        {badgeText}
-                      </span>
-                    ) : (
-                      <span className="text-[9px] text-gray-400 dark:text-slate-600 block leading-tight">--</span>
-                    )}
+                  <div className="text-center w-full pointer-events-none">
+                    <span className="text-[9px] font-semibold block truncate leading-tight">
+                      {badgeText || '--'}
+                    </span>
                   </div>
-                </div>
+                </button>
               );
             })}
-
           </div>
         )}
-
-        {/* Compact Legend */}
-        <div className="mt-4 pt-3 border-t border-gray-100 dark:border-slate-800 flex flex-wrap gap-3 items-center justify-center text-[11px] text-gray-500 dark:text-slate-400">
-          <div className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span>Present</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <span>Late</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-            <span>Early</span>
-          </div>
-        </div>
-
       </div>
+
+      {/* RENDER MODAL COMPONENT HERE */}
+      {isModalOpen && selectedDayRecord && (
+        <AttendanceRequestModal
+          dateStr={selectedDayRecord.dateStr}
+          initialRecord={selectedDayRecord.record}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={() => fetchMonthAttendance()}
+        />
+      )}
 
     </div>
   );

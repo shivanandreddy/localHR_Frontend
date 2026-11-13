@@ -11,6 +11,7 @@ import Punch from './components/Punch';
 import Dashboard from './pages/Dashboard';
 import Payslips from './pages/Payslips'; 
 import Profile from './pages/Profile';
+import AdminAttendanceRequests from './components/AttendanceRequests'; // Import the new admin panel
 
 export default function App() {
   return (
@@ -79,6 +80,16 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['Admin', 'Manager']}>
               <PayrollDashboard />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Protected Admin Attendance Exception Requests Route (Admin & Manager Only) */}
+        <Route 
+          path="/admin/attendance-requests" 
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Manager']}>
+              <AdminAttendanceRequests />
             </ProtectedRoute>
           } 
         />
